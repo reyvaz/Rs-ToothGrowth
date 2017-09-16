@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+<meta name="author" content="Reynaldo" />
+
+
+<title>Analyzing the Effect of Vitamin C on Tooth Growth in Guinea Pigs</title>
+
+<script src="tooth_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="tooth_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="tooth_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="tooth_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="tooth_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="tooth_files/navigation-1.1/tabsets.js"></script>
+<link href="tooth_files/highlightjs-1.1/default.css" rel="stylesheet" />
+<script src="tooth_files/highlightjs-1.1/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Analyzing the Effect of Vitamin C on Tooth Growth in Guinea Pigs</h1>
+<h4 class="author"><em>Reynaldo</em></h4>
+<h4 class="date"><em>4/24/2017</em></h4>
+
+</div>
+
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>This is an analysis of the R dataset ToothGrowth which reports the length of odontoblasts in 60 guinea pigs. Each animal received one of three dose levels of vitamin C (0.5, 1, and 2 mg/day) by one of two delivery methods, orange juice (OJ) or ascorbic acid (VC).</p>
+<ol style="list-style-type: decimal">
+<li>Necessary packages</li>
+</ol>
+<pre class="r"><code>library(ggplot2)
+library(datasets)</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Load data and initial inspection</li>
+</ol>
+<pre class="r"><code>data &lt;- ToothGrowth
+str(data)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    60 obs. of  3 variables:
+##  $ len : num  4.2 11.5 7.3 5.8 6.4 10 11.2 11.2 5.2 7 ...
+##  $ supp: Factor w/ 2 levels &quot;OJ&quot;,&quot;VC&quot;: 2 2 2 2 2 2 2 2 2 2 ...
+##  $ dose: num  0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 0.5 ...</code></pre>
+<pre class="r"><code>summary(data)</code></pre>
+<pre><code>##       len        supp         dose      
+##  Min.   : 4.20   OJ:30   Min.   :0.500  
+##  1st Qu.:13.07   VC:30   1st Qu.:0.500  
+##  Median :19.25           Median :1.000  
+##  Mean   :18.81           Mean   :1.167  
+##  3rd Qu.:25.27           3rd Qu.:2.000  
+##  Max.   :33.90           Max.   :2.000</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>Plot of length growth by dose level and delivery method</li>
+</ol>
+<pre class="r"><code>ggplot(aes(y = len, fill = supp, x = as.factor(dose)), data = data) +
+        geom_violin(alpha = 0.9) + 
+        scale_fill_manual(values=c(&quot;#F83399&quot;, &quot;#6c44ff&quot;), 
+                labels = c(&quot;Orange Juice (OJ)&quot;, &quot;Ascorbic Acid (VC)&quot;)) +
+        ylab(&quot;Length Growth&quot;) + 
+        xlab(&quot;Dose (mg/day)&quot;) +
+        ggtitle(&quot;Tooth Growth by Dose and Delivery Method&quot;) +
+        guides(fill=guide_legend(title=&quot;Delivery Method&quot;)) +
+        theme_bw()</code></pre>
+<p><img src="tooth_files/figure-html/plot1-1.png" width="672" /></p>
+<p>Graphical inspection shows a possible significant response to dose levels as seen by the positive relationship between Length Growth and Dose Level. Delivery method seems to have an effect at the lower dosis levels. The following analysis will test the significance of these differences.</p>
+<div id="t-test-confidence-interval-by-delivery-method-variable-supp" class="section level3">
+<h3>t-test Confidence Interval by Delivery Method (variable supp)</h3>
+<ol start="4" style="list-style-type: decimal">
+<li>First, the following will calculate p.values and 95% confidence intervals comparing the outcomes of the two different delivery methods assuming first equal variance and then non-equal variance.</li>
+</ol>
+<pre class="r"><code>ts0T &lt;- t.test(len ~ supp, paired = FALSE, var.equal = TRUE, data = data)
+ts0F &lt;- t.test(len ~ supp, paired = FALSE, var.equal = FALSE, data = data)</code></pre>
+<ol start="5" style="list-style-type: decimal">
+<li>Tabulate the results</li>
+</ol>
+<pre class="r"><code>tests1 &lt;- list(ts0T, ts0F)
+results1 &lt;- sapply(tests1, function(x) {
+        c(x$estimate[1],
+          x$estimate[2],
+          ci.lower = x$conf.int[1],
+          ci.upper = x$conf.int[2],
+          p.value = x$p.value)
+})
+results1 &lt;- t(results1)
+colnames(results1) &lt;- c(&quot;meanOC&quot;, &quot;meanVC&quot;, 
+                        &quot;C.I.lower&quot;, &quot;C.I.upper&quot;, &quot;p.value&quot;)
+rownames(results1) &lt;- c(&quot;var.equal=TRUE&quot;, &quot;var.equal=FALSE&quot;)
+results1</code></pre>
+<pre><code>##                   meanOC   meanVC  C.I.lower C.I.upper    p.value
+## var.equal=TRUE  20.66333 16.96333 -0.1670064  7.567006 0.06039337
+## var.equal=FALSE 20.66333 16.96333 -0.1710156  7.571016 0.06063451</code></pre>
+<p>Zero is within the 95% confidence interval, therefore we can not reject the null hipothesis that the true difference in means is zero with this confidence level. However, I will explore more the response to delivery methods to the different dosis levels as the last part of this analysis.</p>
+<p>When comparing the two different variance assumptions, there was not significant difference in the results. The same was true for all of the following tests so <strong>for the remainder of this analisys I will assume EQUAL VARIANCES</strong></p>
+</div>
+<div id="t-test-confidence-interval-by-dose-variable-dose" class="section level3">
+<h3>t-test Confidence Interval by Dose (variable dose)</h3>
+<ol start="6" style="list-style-type: decimal">
+<li>Calculate p.values and 95% confidence intervals comparing the mean differences for the three dosis levels assuming equal variance</li>
+</ol>
+<pre class="r"><code>sub1 &lt;- subset(data, dose %in% c(0.5, 1))
+td1T &lt;- t.test(len ~ dose, paired = FALSE, var.equal = TRUE, data = sub1)
+
+sub2 &lt;- subset(data, dose %in% c(0.5, 2))
+td2T &lt;- t.test(len ~ dose, paired = FALSE, var.equal = TRUE, data = sub2)
+
+sub3 &lt;- subset(data, dose %in% c(1, 2))
+td3T &lt;- t.test(len ~ dose, paired = FALSE, var.equal = TRUE, data = sub3)</code></pre>
+<ol start="7" style="list-style-type: decimal">
+<li>Tabulate the results</li>
+</ol>
+<pre class="r"><code>tests2 &lt;- list(td1T, td2T, td3T)
+results2 &lt;- sapply(tests2, function(x) {
+        c(x$estimate[1],
+          x$estimate[2],
+          ci.lower = x$conf.int[1],
+          ci.upper = x$conf.int[2],
+          p.value = x$p.value)
+})
+results2 &lt;- t(results2)
+colnames(results2) &lt;- c(&quot;meanLowDose&quot;, &quot;meanHighDose&quot;, 
+                       &quot;C.I.lower&quot;, &quot;C.I.upper&quot;, &quot;p.value&quot;)
+rownames(results2) &lt;- c(&quot;0.5mg vs 1.0mg&quot;, &quot;0.5mg vs 2.0mg&quot;, 
+                        &quot;1.0mg vs 2.0mg&quot;)
+results2</code></pre>
+<pre><code>##                meanLowDose meanHighDose  C.I.lower  C.I.upper      p.value
+## 0.5mg vs 1.0mg      10.605       19.735 -11.983748  -6.276252 1.266297e-07
+## 0.5mg vs 2.0mg      10.605       26.100 -18.153519 -12.836481 2.837553e-14
+## 1.0mg vs 2.0mg      19.735       26.100  -8.994387  -3.735613 1.810829e-05</code></pre>
+<p>The results show significant differences in the means when comparing any two doses levels. In the three cases we can reject the null hipothesis that the true difference is zero with at least 95% confidence, although the p-values suggest much higher confidence.</p>
+</div>
+<div id="t-test-confidence-interval-by-dose-and-delivery-method" class="section level3">
+<h3>t-test Confidence Interval by Dose and Delivery Method</h3>
+<ol start="8" style="list-style-type: decimal">
+<li>Calculate p.values and 95% confidence intervals comparing the mean differences between delivery methods by dose level.</li>
+</ol>
+<pre class="r"><code>subS1 &lt;- subset(data, dose == 0.5)
+ts1T  &lt;- t.test(len ~ supp, paired = FALSE, var.equal = TRUE, data = subS1)
+
+subS2 &lt;- subset(data, dose == 1)
+ts2T  &lt;- t.test(len ~ supp, paired = FALSE, var.equal = TRUE, data = subS2)
+
+
+subS3 &lt;- subset(data, dose == 2)
+ts3T  &lt;- t.test(len ~ supp, paired = FALSE, var.equal = TRUE, data = subS3)</code></pre>
+<ol start="9" style="list-style-type: decimal">
+<li>Tabulate the results</li>
+</ol>
+<pre class="r"><code>tests3 &lt;- list(ts1T, ts2T, ts3T)
+results3 &lt;- sapply(tests3, function(x) {
+        c(x$estimate[1],
+          x$estimate[2],
+          ci.lower = x$conf.int[1],
+          ci.upper = x$conf.int[2],
+          p.value = x$p.value)
+})
+results3 &lt;- t(results3)
+colnames(results3) &lt;- c(&quot;meanOJ&quot;, &quot;meanVC&quot;, 
+                        &quot;C.I.lower&quot;, &quot;C.I.upper&quot;, &quot;p.value&quot;)
+rownames(results3) &lt;- c(&quot;dose = 0.5mg&quot;, &quot;dose = 1.0mg&quot;, 
+                        &quot;dose = 1.0mg&quot;)
+results3</code></pre>
+<pre><code>##              meanOJ meanVC C.I.lower C.I.upper      p.value
+## dose = 0.5mg  13.23   7.98  1.770262  8.729738 0.0053036613
+## dose = 1.0mg  22.70  16.77  2.840692  9.019308 0.0007807262
+## dose = 1.0mg  26.06  26.14 -3.722999  3.562999 0.9637097790</code></pre>
+<p>Results show a significant difference in means for delivery methods for the two lower dosage levels, however, for the highest dosage this difference vanishes.</p>
+</div>
+</div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+<ol style="list-style-type: decimal">
+<li><p>Higher dosis levels are associated with greater tooth length, independent of delivery method.</p></li>
+<li><p>At the two lower dose levels (0.5 mg/day and 1.0 mg/day), orange juice is associated with greater tooth length than ascorbic acid.</p></li>
+<li><p>At the highest dose level (2.0 mg/day), delivery method seems to have no effect.</p></li>
+<li><p>The variance equality assumption had a negligible effect in the results, therefore only the results assuming equal variance are reported.</p></li>
+</ol>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
