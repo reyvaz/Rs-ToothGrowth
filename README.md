@@ -5,7 +5,7 @@ to see full report in html
 
 This is an analysis of the R dataset ToothGrowth which reports the length of odontoblasts in 60 guinea pigs. Each animal received one of three dose levels of vitamin C by one of two delivery methods, orange juice or ascorbic acid.
 
-t-test analyses found that,
+Performing t-test analyses, it is found that,
 
 1. Higher dosis levels are associated with greater tooth length, independent of delivery method.  
 
