@@ -1,6 +1,6 @@
 ---
 title: "Analyzing the Effect of Vitamin C on Tooth Growth in Guinea Pigs"
-author: "Reynaldo"
+author: "Reynaldo Vazquez"
 date: "4/24/2017"
 output:
   html_document: 
@@ -142,4 +142,6 @@ Results show a significant difference in means for delivery methods for the two 
 
 3. At the highest dose level (2.0 mg/day), delivery method seems to have no effect.   
 
-4. The variance equality assumption had a negligible effect in the results, therefore only the results assuming equal variance are reported.
+4. The variance equality assumption had a negligible effect in the results, therefore only the results assuming equal variance are reported.  
+
+<br>

@@ -20,11 +20,12 @@ The data is available in the R datasets. It was accessed for this analysis on Ap
 * To recreate the entire analysis simply run [tooth.Rmd](tooth.Rmd) script. 
 
 [GitHub Pages Link](https://reyvaz.github.io/Rs-ToothGrowth/)  
-<br><br>
 
-<center>
+
+<br>
+<p align="center">
 <a href="https://reyvaz.github.io/Rs-ToothGrowth/tooth.html" rel="see html report">
-<img src="tooth_files/figure-html/plot1-1.png" alt="Drawing" 
-style="width: 600px;"/></a>
-</center>
-<br><br>
+<img src="tooth_files/figure-html/plot1-1.png" alt="Drawing" width = "500"></a>
+</p>
+<br>
+
